@@ -34,8 +34,6 @@ __version="1.0"
 
 spkfile="$HOME/.config/speaker"
 
-read -r PID <<< "$(pgrep --full "bash $HOME/bin/polyspeaker")"
-
 equalizer() {
   case $1 in
     on ) pulseaudio-equalizer enable &> /dev/null ;;
@@ -44,11 +42,10 @@ equalizer() {
 }
 
 disconnect() {
-  [[ -a "$spkfile" ]] && {
+  [[ -s "$spkfile" ]] && {
     equalizer off
     bluetoothctl disconnect &> /dev/null
-    rm "$spkfile"
-    kill -s HUP "$PID" &> /dev/null
+    :> "$spkfile"
     return 0
   }
   return 1
@@ -86,8 +83,8 @@ is_audio() {
 power() {
   [[ $1 == "off" ]] && disconnect
   bluetoothctl power "$1" &> /dev/null
-  kill -s HUP "$PID" &> /dev/null
   echo "power is turned $1"
+  :> "$spkfile"
 }
 
 is_connected() {
@@ -101,7 +98,7 @@ get_status() {
   else
     echo "power: off"
   fi
-  if [[ -a "$spkfile" ]]; then
+  if [[ -s "$spkfile" ]]; then
     local mac
     mac="$(<"$spkfile")"
     dev="$(get_info "Alias" "$mac")"
@@ -114,7 +111,7 @@ get_status() {
 
 
 reconnect() {
-  [[ -a "$spkfile" ]] || {
+  [[ -s "$spkfile" ]] || {
     echo "no device found."
     return 1
   }
@@ -128,7 +125,6 @@ reconnect() {
       [[ $(mpcw vol) -gt 50 ]] && mpcw dim &> /dev/null
       sleep 3
       equalizer on
-      kill -s HUP "$PID" &> /dev/null
       success=1
       return 0
     }
@@ -186,7 +182,6 @@ while read -r device; do
         echo "$dev successfully connected."
         success=1
       }
-      kill -s HUP "$PID" &> /dev/null
       [[ $success ]] || { 
         echo "could not connect $dev"
         exit 1
