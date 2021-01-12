@@ -20,13 +20,19 @@ Then copy the script in "$HOME/.local/bin": `cp btspk ~/.local/bin`
 
 # USAGE
 
-    **btspk** l | list
-    **btspk** INDEX
-    **btspk** on [INDEX] 
-    **btspk** off
-    **btspk** R
-    **btspk** s | status  
-    **btspk** h | help
+**btspk** l | list
+
+**btspk** INDEX
+
+**btspk** on [INDEX] 
+
+**btspk** off
+
+**btspk** R
+
+**btspk** s | status  
+
+**btspk** h | help
 
 # OPTIONS
 
