@@ -9,6 +9,7 @@ bash, bluez-tools, bluez-utils, pulseaudio-equalizer
 # WARNING
 
 This program is free software, provided AS IS with ABSOLUTELY NO WARRANTY.
+
 See LICENSE file included in this repository.
 
 # INSTALLATION
@@ -19,13 +20,13 @@ Then copy the script in "$HOME/.local/bin": `cp btspk ~/.local/bin`
 
 # USAGE
 
-**btspk** l | list
-**btspk** INDEX
-**btspk** on [INDEX] 
-**btspk** off
-**btspk** R
-**btspk** s | status  
-**btspk** h | help
+    **btspk** l | list
+    **btspk** INDEX
+    **btspk** on [INDEX] 
+    **btspk** off
+    **btspk** R
+    **btspk** s | status  
+    **btspk** h | help
 
 # OPTIONS
 
