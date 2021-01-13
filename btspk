@@ -122,7 +122,6 @@ reconnect() {
     is_connected "$previous" || {
       echo "reconnecting $previous..."
       bluetoothctl connect "$previous" &> /dev/null
-      [[ $(mpcw vol) -gt 50 ]] && mpcw dim &> /dev/null
       sleep 3
       equalizer on
       success=1
@@ -175,7 +174,6 @@ while read -r device; do
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
-        [[ $(mpcw vol) -gt 50 ]] && mpcw dim &> /dev/null
         sleep 3
         equalizer on
         echo "$mac" > "$spkfile"
