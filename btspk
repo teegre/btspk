@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-# Depends on bluez-tools, bluez-utils, pulseaudio, pulseaudio-equalizer
+# Depends on bluez-tools, bluez-utils, coreutils, pulseaudio, pulseaudio-equalizer
 # Connect bluetooth audio devices and enable equalizer.
 
 __help() {
@@ -18,14 +18,14 @@ Usage:
     btspk h | help
 
 Options:
-    l | list   - display a numbered list of paired bluetooth audio devices.
-    INDEX      - connect device.
-    on         - turn bluetooth on.
-    off        - turn bluetooth off.
-    d          - disconnect device.
-    R          - reconnect last device.
-    s | status - show status and exit.
-    h | help   - show this help and exit.
+    l, list   - display a numbered list of paired bluetooth audio devices.
+    INDEX     - connect device.
+    on        - turn bluetooth on.
+    off       - turn bluetooth off.
+    d         - disconnect device.
+    R         - reconnect last device.
+    s, status - show status and exit.
+    h, help   - show this help and exit.
 
 EOB
 }
@@ -120,6 +120,7 @@ reconnect() {
       equalizer off && echo "equalizer off."
       echo "reconnecting $previous..."
       if bluetoothctl connect "$previous" &> /dev/null; then
+        vdim
         echo "$previous connected."
         sleep 3
         equalizer on && echo "equalizer on."
@@ -135,7 +136,7 @@ reconnect() {
 }
 
 echo "btspk version $__version - copyright (c) 2021 teegre."
-echo -e "This program is provided with ABSOLUTELY NO WARRANTY.\n"
+echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
 
 for opt in "$@"; do
   case $opt in
@@ -166,7 +167,13 @@ while read -r device; do
     dev="${BASH_REMATCH[2]}"
     is_audio "$dev" || continue
     ((++index))
-    [[ $LIST ]] && echo -e "$index $dev"
+    [[ $LIST ]] && {
+      if is_connected "$mac"; then
+          echo "$index $dev [*]"
+      else
+          echo "$index $dev"
+      fi
+    }
     [[ ! $LIST ]] && [[ $INDEX == "$index" ]] && {
       is_connected "$mac" && { 
         echo "$dev is already connected..."
@@ -176,6 +183,7 @@ while read -r device; do
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
+        vdim
         sleep 3
         equalizer on && echo "equalizer on."
         echo "$mac" > "$spkfile"
