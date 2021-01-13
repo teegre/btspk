@@ -1,7 +1,7 @@
 # BTSPK / VDIM
 
-Btspk: Connect bluetooth audio device and enable equalizer.
-Vdim: -6dB dimmer.
+**Btspk**: Connect bluetooth audio device and enable equalizer.  
+**Vdim**: -6dB dimmer.  
 
 ## DEPENDENCIES
 
@@ -73,5 +73,5 @@ restore their initial volume.
     - Display currently dimmed client
 
 **h, help**  
-    - Diplay help and exit.
+    - Display help and exit.
 
