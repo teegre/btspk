@@ -1,48 +1,46 @@
-# BTSPK
+# BTSPK / VDIM
 
-Connect bluetooth audio device and enable equalizer.
+Btspk: Connect bluetooth audio device and enable equalizer.
+Vdim: -6dB dimmer.
 
-# DEPENDENCIES
+## DEPENDENCIES
 
-bash, bluez-tools, bluez-utils, pulseaudio-equalizer
+bash, bluez-tools, bluez-utils, coreutils, pulseaudio, pulseaudio-equalizer
 
-# WARNING
+## WARNING
 
 This program is free software, provided AS IS with ABSOLUTELY NO WARRANTY.
 
 See LICENSE file included in this repository.
 
-# INSTALLATION
+## INSTALLATION
 
 Clone this repository `git clone https://gitlab.com/teegre/btspk.git` and `cd btspk`
 
-Then copy the script in "$HOME/.local/bin": `cp btspk ~/.local/bin`
+Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
 
-# USAGE
+## BTSPK USAGE
 
-**btspk** l | list
-
-**btspk** INDEX
-
-**btspk** on [INDEX] 
-
-**btspk** off
-
-**btspk** R
-
+**btspk** l | list  
+**btspk** INDEX  
+**btspk** on [INDEX]  
+**btspk** off  
+**btspk** d  
+**btspk** R  
 **btspk** s | status  
+**btspk** h | help  
 
-**btspk** h | help
 
-# OPTIONS
+## BTSPK OPTIONS
 
 **l, list**  
     - Display a numbered list of available bluetooth audio devices and exit.
 
 **INDEX**  
-    - Connect device.
+    - Turn bluetooth on if needed, connect device and enable equalizer.  
+      If a client is a actually playing, its volume is dimmed by -6dB.
 
-**on** 
+**on**  
     - Turn bluetooth on.
 
 **off**  
@@ -57,5 +55,23 @@ Then copy the script in "$HOME/.local/bin": `cp btspk ~/.local/bin`
 **s, status**  
     - Display status and exit.
 
-**h, help**
+**h, help**  
     - Display help and exit.
+
+## VDIM USAGE
+
+**vdim**  
+**vdim** l | list  
+**vdim** h | help  
+
+## VDIM OPTIONS
+
+When invoked without argument, **vdim** reduces the volume of currently playing applications, or  
+restore their initial volume.
+
+**l, list**  
+    - Display currently dimmed client
+
+**h, help**  
+    - Diplay help and exit.
+
