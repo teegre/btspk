@@ -101,15 +101,16 @@ get_inputs
 for input in "${inputs[@]}"; do
   get_input_volume "$input"
   saved_vol="$(read_saved_volume "$app")"
-  if [[ $saved_vol == "-" ]]; then
+  if [[ $saved_vol == "-" || $saved_vol -le $vol ]] ; then
     # save application volume
     echo "$app;$vol" >> "$volfile"
     # dim
     pacmd set-sink-input-volume "$input" $((vol/2))
     echo "[$app] dim on"
   else
-    # restore volume
-    pacmd set-sink-input-volume $((input)) $((saved_vol))
+    # restore volume if saved_vol > vol
+    ((saved_vol>=vol)) &&
+      pacmd set-sink-input-volume $((input)) $((saved_vol))
     # remove saved volume from file
     remove_saved_volume "$app"
     echo "[$app] dim off"
