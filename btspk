@@ -1,13 +1,13 @@
 #! /usr/bin/env bash
 
-# Depends on bluez-tools, bluez-utils, pulseaudio-equalizer
+# Depends on bluez-tools, bluez-utils, pulseaudio, pulseaudio-equalizer
 # Connect bluetooth audio devices and enable equalizer.
 
 __help() {
 cat << 'EOB' >&2
-btspk: easily connect bluetooth audio devices and enable equalizer.
+Btspk: easily connect bluetooth audio devices and enable equalizer.
 
-usage:
+Usage:
     btspk l | list
     btspk INDEX
     btspk on [INDEX]
@@ -17,15 +17,15 @@ usage:
     btspk s | status
     btspk h | help
 
-options:
-    l | list   - display a numbered list of paired bluetooth audio devices
-    INDEX      - connect device
-    on         - turn bluetooth on
-    off        - turn bluetooth off
-    d          - disconnect device
-    R          - reconnect last device
-    s | status - show status and exit
-    h | help   - show this help and exit
+Options:
+    l | list   - display a numbered list of paired bluetooth audio devices.
+    INDEX      - connect device.
+    on         - turn bluetooth on.
+    off        - turn bluetooth off.
+    d          - disconnect device.
+    R          - reconnect last device.
+    s | status - show status and exit.
+    h | help   - show this help and exit.
 
 EOB
 }
@@ -83,7 +83,7 @@ is_audio() {
 power() {
   [[ $1 == "off" ]] && disconnect
   bluetoothctl power "$1" &> /dev/null
-  echo "power is turned $1"
+  echo "power is turned $1."
   :> "$spkfile"
 }
 
@@ -104,8 +104,6 @@ get_status() {
     dev="$(get_info "Alias" "$mac")"
     [[ $dev =~ ^(.+)[[:space:]]\[.+\]$ ]] &&
       echo "device: ${BASH_REMATCH[1]}"
-  else
-    echo "device: none"
   fi
 }
 
@@ -115,30 +113,34 @@ reconnect() {
     echo "no device found."
     return 1
   }
-  equalizer off
   local previous
   previous="$(<"$spkfile")"
   [[ $previous ]] && {
     is_connected "$previous" || {
+      equalizer off && echo "equalizer off."
       echo "reconnecting $previous..."
-      bluetoothctl connect "$previous" &> /dev/null
-      sleep 3
-      equalizer on
-      success=1
-      return 0
+      if bluetoothctl connect "$previous" &> /dev/null; then
+        echo "$previous connected."
+        sleep 3
+        equalizer on && echo "equalizer on."
+        return 0
+      else
+        echo "could not connect!"
+        return 1
+      fi
     }
-    echo "device is already connected..."
+    echo "A device is already connected..."
     return 1
   }
 }
 
-echo "btspk version $__version - copyright (c) 2021 teegre"
+echo "btspk version $__version - copyright (c) 2021 teegre."
 echo -e "This program is provided with ABSOLUTELY NO WARRANTY.\n"
 
 for opt in "$@"; do
   case $opt in
     l | list) LIST=1; break ;;
-    d   ) echo "disconnecting..."; disconnect || { echo "could not disconnect"; exit 1; }; echo "disconnected"; equalizer on; exit ;;
+    d   ) echo "disconnecting..."; disconnect || { echo "could not disconnect!"; exit 1; }; echo "disconnected."; equalizer on; exit ;;
     R   ) reconnect; exit $? ;;
     on  ) power on ;;
     off ) power off; exit ;;
@@ -148,7 +150,7 @@ for opt in "$@"; do
   esac
 done
 [[ ! $LIST && ! $INDEX ]] && {
-  is_powered || echo "blueetooth is turned off"
+  is_powered || echo "bluetooth is turned off."
   echo "type: 'btspk help' for more info."
   exit
 }
@@ -168,20 +170,20 @@ while read -r device; do
     [[ ! $LIST ]] && [[ $INDEX == "$index" ]] && {
       is_connected "$mac" && { 
         echo "$dev is already connected..."
-        exit
+        exit 0
       }
       echo "connecting $dev..."
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
         sleep 3
-        equalizer on
+        equalizer on && echo "equalizer on."
         echo "$mac" > "$spkfile"
         echo "$dev successfully connected."
         success=1
       }
       [[ $success ]] || { 
-        echo "could not connect $dev"
+        echo "could not connect $dev!"
         exit 1
       }
       exit 0
@@ -190,4 +192,4 @@ while read -r device; do
 done < <(bluetoothctl devices)
 
 echo
-echo "type 'btspk INDEX' to connect a device"
+echo "type 'btspk INDEX' to connect a device."
