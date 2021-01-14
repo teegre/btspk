@@ -120,7 +120,7 @@ reconnect() {
       equalizer off && echo "equalizer off."
       echo "reconnecting $previous..."
       if bluetoothctl connect "$previous" &> /dev/null; then
-        vdim
+        vdim d
         echo "$previous connected."
         sleep 3
         equalizer on && echo "equalizer on."
@@ -183,7 +183,7 @@ while read -r device; do
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
-        vdim
+        vdim d
         sleep 3
         equalizer on && echo "equalizer on."
         echo "$mac" > "$spkfile"
