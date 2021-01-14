@@ -1,11 +1,12 @@
 #! /usr/bin/env bash
 
-# Depends on bluez-tools, bluez-utils, coreutils, pulseaudio, pulseaudio-equalizer
-# Connect bluetooth audio devices and enable equalizer.
+# Connect bluetooth audio devices and optionally enable equalizer.
+# Depends on bluez-tools, bluez-utils, coreutils, pulseaudio
+# Optional dependency: pulseaudio-equalizer or pulseaudio-equalizer-ladspa
 
 __help() {
 cat << 'EOB' >&2
-Btspk: easily connect bluetooth audio devices and enable equalizer.
+btspk: easily connect bluetooth audio devices and enable equalizer.
 
 Usage:
     btspk <index>
@@ -30,7 +31,7 @@ Options:
 EOB
 }
 
-__version="1.0"
+__version="1.2"
 
 spkfile="$HOME/.config/speaker"
 

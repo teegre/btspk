@@ -5,7 +5,8 @@
 
 ## DEPENDENCIES
 
-bash, bluez-tools, bluez-utils, coreutils, pulseaudio, pulseaudio-equalizer
+bash, bluez-tools, bluez-utils, coreutils, pulseaudio.  
+Optional: pulseaudio-equalizer or pulseaudio-equalizer-ladspa.
 
 ## WARNING
 
