@@ -29,8 +29,6 @@ To uninstall:
 make uninstall
 ```
 
-Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
-
 ## BTSPK USAGE
 
 **btspk** l | list  
