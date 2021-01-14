@@ -22,8 +22,8 @@ Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
 ## BTSPK USAGE
 
 **btspk** l | list  
-**btspk** INDEX  
-**btspk** on [INDEX]  
+**btspk** <index>  
+**btspk** on [index]  
 **btspk** off  
 **btspk** d  
 **btspk** R  
@@ -33,10 +33,10 @@ Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
 
 ## BTSPK OPTIONS
 
-**l, list**  
-    - Display a numbered list of available bluetooth audio devices and exit.
+When invoked without argument, **btspk** displays a numbered list of  
+paired bluetooth audio devices.
 
-**INDEX**  
+**<index>**  
     - Turn bluetooth on if needed, connect device and enable equalizer.  
       If a client is a actually playing, its volume is dimmed by -6dB.
 
@@ -68,8 +68,8 @@ Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
 
 ## VDIM OPTIONS
 
-When invoked without argument, **vdim** reduces the volume of currently playing applications, or  
-restore their initial volume.
+When invoked without argument, **vdim** reduces the volume  
+of currently playing applications, or restore their initial volume.
 
 **l, list**  
     - Display currently dimmed clients and exit.
