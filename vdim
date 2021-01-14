@@ -7,7 +7,6 @@ declare -a inputs
 declare vol
 declare app
 declare volfile="$HOME/.config/speaker.volume"
-declare __version="1.0"
 
 __help() {
 cat << 'EOB' >&2
@@ -16,11 +15,18 @@ Vdim: -6dB dimmer for pulseaudio
 Usage:
   vdim
   vdim l | list
+  vdim d | dim
+  vdim r | restore
   vdim h | help
 
-Options
-  l, list - display currently dimmed clients and exit.
-  h, help - display this help and exit.
+Options:
+  Invoked without argument, vdim reduces the volume of currently
+  playing applications, or restore their initial volume.
+
+  l, list    - display currently dimmed clients and exit.
+  d, dim     - change volume for undimmed clients only.
+  r, restore - restore dimmed clients only.
+  h, help    - display this help and exit.
 
 EOB
 }
@@ -78,41 +84,56 @@ remove_saved_volume() {
 }
 
 list_dimmed_clients() {
-  [[ -s "$volfile" ]] || { echo "no dimmed client."; return 0; }
+  [[ -s "$volfile" ]] || { echo "[dim] no dimmed client."; return 0; }
   while read -r info; do
     [[ $info =~ ^(.+)\;.*$ ]] &&
       echo "${BASH_REMATCH[1]}"
   done < "$volfile"
 }
 
-echo "vdim version $__version - copyright (c) 2021 teegre."
-echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
-
 for opt in "$@"; do
   case $opt in
-    l | list) list_dimmed_clients; exit ;;
-    h | help) __help; exit ;;
-    *       ) echo "Invalid option '$opt'!"; exit
+    l | list    ) list_dimmed_clients; exit ;;
+    d | dim     ) DIM=1; break ;;
+    r | restore ) RESTORE=1; break ;;
+    h | help    ) __help; exit ;;
+    *           ) echo "Invalid option '$opt'!"; exit
   esac
 done
 
 get_inputs
 [[ ${inputs[*]} ]] || { echo "[dim] not playing."; exit; }
 for input in "${inputs[@]}"; do
+
   get_input_volume "$input"
   saved_vol="$(read_saved_volume "$app")"
-  if [[ $saved_vol == "-" || $saved_vol -le $vol ]] ; then
+
+  # do not dim already dimmed client 
+  [[ $saved_vol == "-" ]] || { [[ $DIM ]] && continue; }
+
+  # do not restore if client is not dimmed
+  [[ $saved_vol == "-" ]] && { [[ $RESTORE ]] && continue; }
+
+  # dim only if
+  # client is not dimmed yet or
+  # if saved volume is lower or equal to actual client's volume
+  # and if RESTORE option is not set.
+  if [[ $saved_vol == "-" || $saved_vol -le $vol ]] && [[ ! $RESTORE ]]; then
     # save application volume
     echo "$app;$vol" >> "$volfile"
     # dim
-    pacmd set-sink-input-volume "$input" $((vol/2))
-    echo "[$app] dim on"
+    pacmd set-sink-input-volume "$input" $((vol/2)) &> /dev/null
+    echo "[${app,,}] dim on."
+    action=1
   else
-    # restore volume if saved_vol > vol
+    # restore volume if saved volume is greater or equal to actual client's volume
     ((saved_vol>=vol)) &&
-      pacmd set-sink-input-volume $((input)) $((saved_vol))
+      pacmd set-sink-input-volume $((input)) $((saved_vol)) &> /dev/null
     # remove saved volume from file
     remove_saved_volume "$app"
-    echo "[$app] dim off"
+    echo "[${app,,}] dim off."
+    action=1
   fi
 done
+
+[[ $action ]] || echo "[dim] nothing to do."
