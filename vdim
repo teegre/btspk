@@ -108,7 +108,7 @@ for input in "${inputs[@]}"; do
   get_input_volume "$input"
   saved_vol="$(read_saved_volume "$app")"
 
-  # do not dim already dimmed client 
+  # do not dim already dimmed client
   [[ $saved_vol == "-" ]] || { [[ $DIM ]] && continue; }
 
   # do not restore if client is not dimmed
