@@ -16,7 +16,18 @@ See LICENSE file included in this repository.
 
 ## INSTALLATION
 
-Clone this repository `git clone https://gitlab.com/teegre/btspk.git` and `cd btspk`
+Clone this repository `git clone https://gitlab.com/teegre/btspk.git` and: 
+
+```
+cd btspk
+make install
+```
+
+To uninstall:
+
+```
+make uninstall
+```
 
 Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
 
