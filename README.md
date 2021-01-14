@@ -62,6 +62,8 @@ Then copy the scripts **btspk** and **vdim** to "$HOME/.local/bin"
 
 **vdim**  
 **vdim** l | list  
+**vdim** d | dim
+**vdim** r | restore
 **vdim** h | help  
 
 ## VDIM OPTIONS
@@ -70,7 +72,13 @@ When invoked without argument, **vdim** reduces the volume of currently playing 
 restore their initial volume.
 
 **l, list**  
-    - Display currently dimmed client
+    - Display currently dimmed clients and exit.
+
+**d, dim**  
+    - Dim volume of undimmed clients only.
+
+**r, restore**  
+    - Restore dimmed clients only.
 
 **h, help**  
     - Display help and exit.
