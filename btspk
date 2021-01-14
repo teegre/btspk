@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # Connect bluetooth audio devices and optionally enable equalizer.
-# Depends on bluez-tools, bluez-utils, coreutils, pulseaudio
+# Depends on bluez-tools, bluez-utils, coreutils, libpulse, pulseaudio
 # Optional dependency: pulseaudio-equalizer or pulseaudio-equalizer-ladspa
 
 __help() {
