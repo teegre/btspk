@@ -34,7 +34,7 @@ make uninstall
 ## BTSPK USAGE
 
 **btspk** l | list  
-**btspk** <index>  
+**btspk** index  
 **btspk** on [index]  
 **btspk** off  
 **btspk** d  
@@ -48,7 +48,7 @@ make uninstall
 When invoked without argument, **btspk** displays a numbered list of  
 paired bluetooth audio devices.
 
-**<index>**  
+**index**  
     - Turn bluetooth on if needed, connect device and enable equalizer.  
       If a client is a actually playing, its volume is dimmed by -6dB.
 
