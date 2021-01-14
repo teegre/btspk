@@ -16,6 +16,8 @@ See LICENSE file included in this repository.
 
 ## INSTALLATION
 
+This program is available in the (Arch User Repository)[https://aur.archlinux.org/packages/btspk/].
+
 Clone this repository `git clone https://gitlab.com/teegre/btspk.git` and: 
 
 ```
