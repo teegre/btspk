@@ -8,9 +8,8 @@ cat << 'EOB' >&2
 Btspk: easily connect bluetooth audio devices and enable equalizer.
 
 Usage:
-    btspk l | list
-    btspk INDEX
-    btspk on [INDEX]
+    btspk <index>
+    btspk on [index]
     btspk off
     btspk d
     btspk R
@@ -18,8 +17,9 @@ Usage:
     btspk h | help
 
 Options:
-    l, list   - display a numbered list of paired bluetooth audio devices.
-    INDEX     - connect device.
+    Invoked without argument, display a numbered list of paired bluetooth audio devices.
+
+    <index>   - connect device.
     on        - turn bluetooth on.
     off       - turn bluetooth off.
     d         - disconnect device.
@@ -45,7 +45,7 @@ equalizer() {
 disconnect() {
   [[ -s "$spkfile" ]] && {
     equalizer off
-    bluetoothctl disconnect &> /dev/null
+    bluetoothctl disconnect &> /dev/null || return 1
     :> "$spkfile"
     return 0
   }
@@ -53,14 +53,17 @@ disconnect() {
 }
 
 _disconnect() {
-  echo "disconnecting..."
+  local dev
+  [[ -s "$spkfile" ]] &&
+    dev="$(get_alias "$(<"$spkfile")")"
+  echo "[${dev,,}] disconnecting..."
   cp "$spkfile" "${spkfile}.last" &> /dev/null
   disconnect || { 
-    echo "could not disconnect!"
+    echo "[${dev,,}] could not disconnect!"
     rm "${spkfile}.last" &> /dev/null
     return 1
   }
-  echo "disconnected."
+  echo "[${dev,,}] disconnected."
   equalizer on && echo "equalizer on."
   return 0
 }
@@ -85,7 +88,7 @@ get_info() {
       echo "${BASH_REMATCH[1]}"
       return 0
     }
-  done < <(bt-device -i "$1")
+  done < <(bt-device -i "$1" 2>/dev/null)
   return 1
 }
 
@@ -95,9 +98,10 @@ is_audio() {
 }
 
 get_alias() {
-    local dev
+    local dev __r
+    __r="^(.+)[[:space:]]\[.+\]$"
     dev="$(get_info "Alias" "$1")"
-    [[ $dev =~ ^(.+)[[:space:]]\[.+\]$ ]] && {
+    [[ $dev =~ $__r ]] && {
       echo "${BASH_REMATCH[1]}"
       return 0
     }
@@ -142,17 +146,17 @@ reconnect() {
       equalizer off && echo "equalizer off."
       local dev
       dev="$(get_alias "$previous")"
-      echo "reconnecting $dev..."
+      echo "[${dev,,}] reconnecting..."
       if bluetoothctl connect "$previous" &> /dev/null; then
         vdim d
-        echo "$dev connected."
+        echo "[${dev,,}] connected."
         cp "${spkfile}.last" "$spkfile" &> /dev/null
         rm "${spkfile}.last"
         sleep 3
         equalizer on && echo "equalizer on."
         return 0
       else
-        echo "could not connect!"
+        echo "[${dev,,}] could not connect!"
         return 1
       fi
     }
@@ -166,22 +170,26 @@ echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
 
 for opt in "$@"; do
   case $opt in
-    l | list  ) LIST=1; break ;;
     d         ) _disconnect; exit $? ;; 
     R         ) reconnect; exit $? ;;
     on        ) power on ;;
     off       ) power off; exit ;;
     s | status) get_status; exit ;;
     h | help  ) __help; exit ;;
-    *         ) INDEX="$opt"
+    *         ) if [[ $opt =~ ^[0-9+$] ]]; then INDEX="$opt"; else echo "invalid option '$opt'"; exit 1; fi
   esac
 done
-[[ ! $LIST && ! $INDEX ]] && {
-  is_powered || echo "bluetooth is turned off."
-  echo "type: 'btspk help' for more info."
-  exit
+
+
+[[ $* ]] || {
+  is_powered || echo -e "bluetooth is turned off.\n"
+  [[ -s "${spkfile}.last" ]] && {
+    dev="$(get_alias "$(<"${spkfile}.last")")"
+    [[ $dev ]] || rm "${spkfile}.last"
+    [[ $dev ]] && echo -e "[${dev,,}] last connected device.\n"
+  }
+  LIST=1
 }
-# get paired devices
 
 __r="^Device ([0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}) (.+)$"
 
@@ -195,17 +203,17 @@ while read -r device; do
     ((++index))
     [[ $LIST ]] && {
       if is_connected "$mac"; then
-          echo "$index $dev [*]"
+          printf "%03d --- %s\n" "$index" "${dev,,} [*]"
       else
-          echo "$index $dev"
+          printf "%03d --- %s\n" "$index" "${dev,,}"
       fi
     }
-    [[ ! $LIST ]] && [[ $INDEX == "$index" ]] && {
+    [[ ! $LIST ]] && ((INDEX==index)) && {
       is_connected "$mac" && { 
         echo "$dev is already connected..."
         exit 0
       }
-      echo "connecting $dev..."
+      echo "[${dev,,}] connecting..."
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
@@ -213,11 +221,11 @@ while read -r device; do
         sleep 3
         equalizer on && echo "equalizer on."
         echo "$mac" > "$spkfile"
-        echo "$dev successfully connected."
+        echo "[${dev,,}] successfully connected."
         success=1
       }
       [[ $success ]] || { 
-        echo "could not connect $dev!"
+        echo "[${dev,,}] cannot connect!"
         exit 1
       }
       exit 0
@@ -226,4 +234,5 @@ while read -r device; do
 done < <(bluetoothctl devices)
 
 echo
-echo "type 'btspk INDEX' to connect a device."
+echo "type 'btspk <index>' to connect a device."
+echo "type 'btspk help' for more info."
