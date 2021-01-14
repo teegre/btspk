@@ -36,9 +36,10 @@ spkfile="$HOME/.config/speaker"
 
 equalizer() {
   case $1 in
-    on ) pulseaudio-equalizer enable &> /dev/null ;;
-    off) pulseaudio-equalizer disable &> /dev/null
+    on ) pulseaudio-equalizer enable &> /dev/null && return 0 ;;
+    off) pulseaudio-equalizer disable &> /dev/null && return 0 ;;
   esac
+  return 1
 }
 
 disconnect() {
@@ -49,6 +50,19 @@ disconnect() {
     return 0
   }
   return 1
+}
+
+_disconnect() {
+  echo "disconnecting..."
+  cp "$spkfile" "${spkfile}.last" &> /dev/null
+  disconnect || { 
+    echo "could not disconnect!"
+    rm "${spkfile}.last" &> /dev/null
+    return 1
+  }
+  echo "disconnected."
+  equalizer on && echo "equalizer on."
+  return 0
 }
 
 is_powered() {
@@ -80,6 +94,16 @@ is_audio() {
   return 1
 }
 
+get_alias() {
+    local dev
+    dev="$(get_info "Alias" "$1")"
+    [[ $dev =~ ^(.+)[[:space:]]\[.+\]$ ]] && {
+      echo "${BASH_REMATCH[1]}"
+      return 0
+    }
+    return 1
+}
+
 power() {
   [[ $1 == "off" ]] && disconnect
   bluetoothctl power "$1" &> /dev/null
@@ -101,27 +125,29 @@ get_status() {
   if [[ -s "$spkfile" ]]; then
     local mac
     mac="$(<"$spkfile")"
-    dev="$(get_info "Alias" "$mac")"
-    [[ $dev =~ ^(.+)[[:space:]]\[.+\]$ ]] &&
-      echo "device: ${BASH_REMATCH[1]}"
+    dev="$(get_alias "$mac")"
+    [[ $dev ]] && echo "device: $dev"
   fi
 }
 
-
 reconnect() {
-  [[ -s "$spkfile" ]] || {
+  [[ -s "${spkfile}.last" ]] || {
     echo "no device found."
     return 1
   }
   local previous
-  previous="$(<"$spkfile")"
+  previous="$(<"${spkfile}.last")"
   [[ $previous ]] && {
     is_connected "$previous" || {
       equalizer off && echo "equalizer off."
-      echo "reconnecting $previous..."
+      local dev
+      dev="$(get_alias "$previous")"
+      echo "reconnecting $dev..."
       if bluetoothctl connect "$previous" &> /dev/null; then
         vdim d
-        echo "$previous connected."
+        echo "$dev connected."
+        cp "${spkfile}.last" "$spkfile" &> /dev/null
+        rm "${spkfile}.last"
         sleep 3
         equalizer on && echo "equalizer on."
         return 0
@@ -140,14 +166,14 @@ echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
 
 for opt in "$@"; do
   case $opt in
-    l | list) LIST=1; break ;;
-    d   ) echo "disconnecting..."; disconnect || { echo "could not disconnect!"; exit 1; }; echo "disconnected."; equalizer on; exit ;;
-    R   ) reconnect; exit $? ;;
-    on  ) power on ;;
-    off ) power off; exit ;;
+    l | list  ) LIST=1; break ;;
+    d         ) _disconnect; exit $? ;; 
+    R         ) reconnect; exit $? ;;
+    on        ) power on ;;
+    off       ) power off; exit ;;
     s | status) get_status; exit ;;
-    h | help   ) __help; exit ;;
-    *   ) INDEX="$opt"
+    h | help  ) __help; exit ;;
+    *         ) INDEX="$opt"
   esac
 done
 [[ ! $LIST && ! $INDEX ]] && {
