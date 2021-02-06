@@ -45,16 +45,16 @@ dim() {
             echo "dimmed."
             return 0
           fi
-      elif ((vol<saved_vol)); then
-        # restore saved volume
-        pacmd set-sink-volume $((index)) $((saved_vol))
-        :> "$volfile"
-        echo "restored."
-        return 0
-      else
-        echo "nothing to do."
-        return 0
-      fi
+       fi
+       if ((vol<saved_vol)); then
+         # restore saved volume
+         pacmd set-sink-volume $((index)) $((saved_vol))
+         :> "$volfile"
+         echo "restored."
+         return 0
+       fi
+       echo "nothing to do."
+       return 0
     }
   }
   done < <(pacmd list-sinks)
