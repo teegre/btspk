@@ -73,14 +73,11 @@ paired bluetooth audio devices.
 ## VDIM USAGE
 
 **vdim**  
-**vdim** l | list  
-**vdim** d | dim
-**vdim** r | restore
 **vdim** h | help  
 
 ## VDIM OPTIONS
 
-When invoked  **vdim** reduces default sink volume by 6dB,
+When invoked, **vdim** reduces default sink volume by 6dB,
 or restore its initial volume.
 
 **h, help**  
