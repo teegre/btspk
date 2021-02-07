@@ -31,7 +31,7 @@ Options:
 EOB
 }
 
-__version="1.2.1"
+__version="1.2.2"
 
 spkfile="$HOME/.config/speaker"
 
@@ -45,8 +45,10 @@ equalizer() {
 
 disconnect() {
   [[ -s "$spkfile" ]] && {
+    local mac
+    mac="$(<"$spkfile")"
     equalizer off
-    bluetoothctl disconnect &> /dev/null || return 1
+    bluetoothctl disconnect "$mac" &> /dev/null || return 1
     :> "$spkfile"
     return 0
   }
@@ -217,9 +219,10 @@ while read -r device; do
       echo "[${dev,,}] connecting..."
       is_powered && disconnect
       is_powered || power on
+      equalizer off
+      sleep 2
       bluetoothctl connect "$mac" &> /dev/null && {
-        vdim d
-        sleep 3
+        vdim "$mac"
         equalizer on && echo "equalizer on."
         echo "$mac" > "$spkfile"
         echo "[${dev,,}] successfully connected."
