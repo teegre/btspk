@@ -31,7 +31,7 @@ Options:
 EOB
 }
 
-__version="1.2.2"
+__version="1.2.3"
 
 spkfile="$HOME/.config/speaker"
 
@@ -114,7 +114,7 @@ get_alias() {
 power() {
   [[ $1 == "off" ]] && disconnect
   bluetoothctl power "$1" &> /dev/null
-  echo "power is turned $1."
+  echo "power $1."
   :> "$spkfile"
 }
 
@@ -130,7 +130,7 @@ get_status() {
     echo "power: off"
   fi
   if [[ -s "$spkfile" ]]; then
-    local mac
+    local mac dev
     mac="$(<"$spkfile")"
     dev="$(get_alias "$mac")"
     [[ $dev ]] && echo "device: $dev"
@@ -151,7 +151,6 @@ reconnect() {
       dev="$(get_alias "$previous")"
       echo "[${dev,,}] reconnecting..."
       if bluetoothctl connect "$previous" &> /dev/null; then
-        vdim d
         echo "[${dev,,}] connected."
         cp "${spkfile}.last" "$spkfile" &> /dev/null
         rm "${spkfile}.last"
