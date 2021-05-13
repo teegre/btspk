@@ -31,11 +31,12 @@ Options:
 EOB
 }
 
-__version="1.2.3"
+__version="1.2.4"
 
 spkfile="$HOME/.config/speaker"
 
 equalizer() {
+  which pulseaudio-equalizer &> /dev/null || return 1
   case $1 in
     on ) pulseaudio-equalizer enable &> /dev/null && return 0 ;;
     off) pulseaudio-equalizer disable &> /dev/null && return 0 ;;
@@ -114,7 +115,7 @@ get_alias() {
 power() {
   [[ $1 == "off" ]] && disconnect
   bluetoothctl power "$1" &> /dev/null
-  echo "power $1."
+  echo "power ${1}."
   :> "$spkfile"
 }
 
@@ -162,13 +163,15 @@ reconnect() {
         return 1
       fi
     }
-    echo "A device is already connected..."
+    echo "a device is already connected..."
     return 1
   }
 }
 
-echo "btspk version $__version - copyright (c) 2021 teegre."
-echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
+[[ $* ]] || {
+  echo "btspk version $__version - copyright (c) 2021 teegre."
+  echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
+}
 
 for opt in "$@"; do
   case $opt in
@@ -184,7 +187,7 @@ done
 
 
 [[ $* ]] || {
-  is_powered || echo -e "bluetooth is turned off.\n"
+  is_powered || echo -e "bluetooth is off.\n"
   [[ -s "${spkfile}.last" ]] && {
     dev="$(get_alias "$(<"${spkfile}.last")")"
     [[ $dev ]] || rm "${spkfile}.last"
@@ -235,6 +238,11 @@ while read -r device; do
     }
   }
 done < <(bluetoothctl devices)
+
+[[ $INDEX ]] && {
+  echo "index not found."
+  exit 1
+}
 
 echo
 echo "type 'btspk <index>' to connect a device."
