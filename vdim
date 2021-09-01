@@ -33,60 +33,59 @@ get_sink_index_from_mac_address() {
 }
 
 dim() {
-  local info index go r1 r2 r3 vol
-  [[ $1 ]] && {
-    index="$(get_sink_index_from_mac_address "$1")" || {
-      echo "cannot find device index"
+  local mac sink info r vol
+
+  mac="$1"
+  
+  [[ $mac ]] && {
+    sink="$(get_sink_index_from_mac_address "$mac")" || {
+      >&2 echo "dim: could not retrieve device index."
       return 1
     }
   }
 
-  r1="^\* index:[[:space:]]*(.+)$"
-  r2="^volume:[[:space:]]*front\-left:[[:space:]]*([0-9]+).*$"
-  r3="^used by:[[:space:]]*(.+)$"
-
-  while read -r info; do
-    [[ $info =~ $r1 ]] && {
-      index="${index:-"${BASH_REMATCH[1]}"}"
-      go=1
-      continue
-    }
-    [[ $go ]] && {
-      [[ $info =~ $r2 ]] && {
-        # current volume
-        vol="${BASH_REMATCH[1]}"
-        [[ -a "$volfile" ]] && saved_vol="$(<"$volfile")" || saved_vol=0
-        continue
-      }
-      [[ $info =~ $r3 ]] && {
-        # is there any active client?
-        if [[ ${BASH_REMATCH[1]} -gt 0 ]]; then
-          # dim sink and save current volume.
-          if ((vol>saved_vol)); then
-            pacmd set-sink-volume $((index)) $((vol/2))
-            echo "$vol" > "$volfile"
-            echo "dimmed."
-            return 0
-          fi
-       fi
-       if ((vol<saved_vol)); then
-         # restore saved volume
-         pacmd set-sink-volume $((index)) $((saved_vol))
-         :> "$volfile"
-         echo "restored."
-         return 0
-       fi
-       echo "nothing to do."
-       return 0
+  [[ $mac ]] || {
+    sink="$(pactl get-default-sink)" || {
+      >&2 echo "dim: could not retrieve default sink."
+      return 1
     }
   }
-  done < <(pacmd list-sinks)
-  return 1
+
+  r="^volume:[[:space:]]*front\-left:[[:space:]]*([0-9]+).*$"
+
+  info="$(pactl get-sink-volume "$sink")"
+  [[ ${info,,} =~ $r ]] && {
+      # current volume
+      vol="${BASH_REMATCH[1]}"
+  }
+
+  [[ -a "$volfile" ]] && saved_vol="$(<"$volfile")" || saved_vol=0
+  # dim sink and save current volume.
+  if ((vol>saved_vol)); then
+    pactl set-sink-volume "$sink" $((vol/2))
+    echo "$vol" > "$volfile"
+    echo "volume dimmed."
+    return 0
+  elif ((vol<saved_vol)); then
+    # restore saved volume
+    pactl set-sink-volume "$sink" $((saved_vol))
+    :> "$volfile"
+    echo "volume restored."
+    return 0
+  fi
+
+  echo "nothing to do."
+  return 0
 }
 
 [[ $1 == "h" || $1 == "help" ]] && {
   __help;
   exit 0
+}
+
+[[ $1 == "debug" ]] && {
+  shift
+  "$@" && exit 0 || exit 1
 }
 
 dim "$1" || echo "[!] there was an error."
