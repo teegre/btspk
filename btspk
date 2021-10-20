@@ -31,7 +31,7 @@ Options:
 EOB
 }
 
-__version="1.2.5"
+__version="1.2.6"
 
 spkfile="$HOME/.config/speaker"
 
@@ -97,7 +97,7 @@ get_info() {
 }
 
 is_audio() {
-  [[ $(get_info "Icon" "$1") == "audio-card" ]] && return 0
+  [[ $(get_info "Icon" "$1") =~ ^audio* ]] && return 0
   return 1
 }
 
