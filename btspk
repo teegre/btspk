@@ -207,7 +207,7 @@ while read -r device; do
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
-        sleep 2
+        sleep 4
         vdim "$mac"
         echo "$mac" > "$spkfile"
         echo "[${dev,,}] successfully connected."
