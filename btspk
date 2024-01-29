@@ -1,12 +1,11 @@
 #! /usr/bin/env bash
 
-# Connect bluetooth audio devices and optionally enable equalizer.
+# Connect bluetooth audio devices.
 # Depends on bluez-tools, bluez-utils, coreutils, libpulse, pulseaudio
-# Optional dependency: pulseaudio-equalizer or pulseaudio-equalizer-ladspa
 
 __help() {
 cat << 'EOB' >&2
-btspk: easily connect bluetooth audio devices and enable equalizer.
+btspk: easily connect bluetooth audio devices.
 
 Usage:
     btspk <index>
@@ -31,24 +30,14 @@ Options:
 EOB
 }
 
-__version="1.2.6"
+__version="1.2.7"
 
 spkfile="$HOME/.config/speaker"
-
-equalizer() {
-  which pulseaudio-equalizer &> /dev/null || return 1
-  case $1 in
-    on ) pulseaudio-equalizer enable &> /dev/null && return 0 ;;
-    off) pulseaudio-equalizer disable &> /dev/null && return 0 ;;
-  esac
-  return 1
-}
 
 disconnect() {
   [[ -s "$spkfile" ]] && {
     local mac
     mac="$(<"$spkfile")"
-    equalizer off
     bluetoothctl disconnect "$mac" &> /dev/null || return 1
     :> "$spkfile"
     return 0
@@ -68,7 +57,6 @@ _disconnect() {
     return 1
   }
   echo "[${dev,,}] disconnected."
-  equalizer on && echo "equalizer on."
   return 0
 }
 
@@ -147,7 +135,6 @@ reconnect() {
   previous="$(<"${spkfile}.last")"
   [[ $previous ]] && {
     is_connected "$previous" || {
-      equalizer off && echo "equalizer off."
       local dev
       dev="$(get_alias "$previous")"
       echo "[${dev,,}] reconnecting..."
@@ -155,8 +142,6 @@ reconnect() {
         echo "[${dev,,}] connected."
         cp "${spkfile}.last" "$spkfile" &> /dev/null
         rm "${spkfile}.last"
-        sleep 3
-        equalizer on && echo "equalizer on."
         return 0
       else
         echo "[${dev,,}] could not connect!"
@@ -221,11 +206,9 @@ while read -r device; do
       echo "[${dev,,}] connecting..."
       is_powered && disconnect
       is_powered || power on
-      equalizer off
-      sleep 2
       bluetoothctl connect "$mac" &> /dev/null && {
+        sleep 2
         vdim "$mac"
-        equalizer on && echo "equalizer on."
         echo "$mac" > "$spkfile"
         echo "[${dev,,}] successfully connected."
         success=1

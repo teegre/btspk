@@ -1,12 +1,11 @@
 # BTSPK / VDIM
 
-**Btspk**: Connect bluetooth audio device and enable equalizer.  
+**Btspk**: Connect bluetooth audio device.  
 **Vdim**: -6dB dimmer.  
 
 ## DEPENDENCIES
 
-bash, bluez-tools, bluez-utils, coreutils, libpulse, pulseaudio.  
-Optional: pulseaudio-equalizer or pulseaudio-equalizer-ladspa.
+Latest version of: bash, bluez-tools, bluez-utils, coreutils, libpulse, pulseaudio.  
 
 ## WARNING
 
@@ -49,7 +48,7 @@ When invoked without argument, **btspk** displays a numbered list of
 paired bluetooth audio devices.
 
 **index**  
-    - Turn bluetooth on if needed, connect device and enable equalizer.  
+    - Turn bluetooth on if needed and connect device.
       If a client is a actually playing, its volume is dimmed by -6dB.
 
 **on**  
@@ -82,4 +81,3 @@ or restore its initial volume.
 
 **h, help**  
     - Display help and exit.
-
