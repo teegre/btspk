@@ -8,7 +8,6 @@ install: $(PROGNAME).out
 	install -d $(DESTDIR)$(BINDIR)
 
 	install -m755 $(PROGNAME).out $(DESTDIR)$(BINDIR)/$(PROGNAME)
-	install -m755 ./vdim $(DESTDIR)$(BINDIR)/vdim
 
 	install -Dm644 LICENSE -t $(DESTDIR)$(SHAREDIR)/licenses/$(PROGNAME)
 
@@ -17,5 +16,4 @@ install: $(PROGNAME).out
 .PHONY: uninstall
 uninstall:
 	rm $(DESTDIR)$(BINDIR)/$(PROGNAME)
-	rm $(DESTDIR)$(BINDIR)/vdim
 	rm -rf $(DESTDIR)$(SHAREDIR)/licenses/$(PROGNAME)

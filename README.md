@@ -1,15 +1,15 @@
-# BTSPK / VDIM
+# BTSPK
 
 **Btspk**: Connect bluetooth audio device.  
-**Vdim**: -6dB dimmer.  
 
 ## DEPENDENCIES
 
-Latest version of: bash, bluez-tools, bluez-utils, coreutils, libpulse, pulseaudio.  
+Latest version of: bash, bluez-tools, bluez-utils, coreutils.  
 
-## WARNING
+## LICENSE
 
-This program is free software, provided AS IS with ABSOLUTELY NO WARRANTY.
+This program is released under the terms of the GPL version 3 license.
+It is free software, provided AS IS with ABSOLUTELY NO WARRANTY.
 
 See LICENSE file included in this repository.
 
@@ -49,7 +49,6 @@ paired bluetooth audio devices.
 
 **index**  
     - Turn bluetooth on if needed and connect device.
-      If a client is a actually playing, its volume is dimmed by -6dB.
 
 **on**  
     - Turn bluetooth on.
@@ -69,15 +68,3 @@ paired bluetooth audio devices.
 **h, help**  
     - Display help and exit.
 
-## VDIM USAGE
-
-**vdim**  
-**vdim** h | help  
-
-## VDIM OPTIONS
-
-When invoked, **vdim** reduces default sink volume by 6dB,
-or restore its initial volume.
-
-**h, help**  
-    - Display help and exit.

@@ -30,7 +30,7 @@ Options:
 EOB
 }
 
-__version="1.2.7"
+__version="1.2.8"
 
 spkfile="$HOME/.config/speaker"
 
@@ -154,7 +154,7 @@ reconnect() {
 }
 
 [[ $* ]] || {
-  echo "btspk version $__version - copyright (c) 2021 teegre."
+  echo "btspk version $__version - copyright (c) 2024 teegre."
   echo -e "This program is provided AS IS with ABSOLUTELY NO WARRANTY.\n"
 }
 
@@ -208,7 +208,6 @@ while read -r device; do
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
         sleep 4
-        vdim "$mac"
         echo "$mac" > "$spkfile"
         echo "[${dev,,}] successfully connected."
         success=1
