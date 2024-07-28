@@ -1,8 +1,5 @@
 #! /usr/bin/env bash
 
-# Connect bluetooth audio devices.
-# Depends on bluez-tools, bluez-utils, coreutils, libpulse, pulseaudio
-
 __help() {
 cat << 'EOB' >&2
 btspk: easily connect bluetooth audio devices.
