@@ -15,7 +15,7 @@ See LICENSE file included in this repository.
 
 ## INSTALLATION
 
-Clone this repository `git clone https://gitlab.com/teegre/btspk.git` and: 
+Clone this repository, then :
 
 ```
 cd btspk
@@ -65,4 +65,3 @@ paired bluetooth audio devices.
 
 **h, help**  
     - Display help and exit.
-
