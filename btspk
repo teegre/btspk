@@ -27,7 +27,7 @@ Options:
 EOB
 }
 
-__version="1.2.8"
+__version="1.2.9"
 
 spkfile="$HOME/.config/speaker"
 
@@ -204,7 +204,6 @@ while read -r device; do
       is_powered && disconnect
       is_powered || power on
       bluetoothctl connect "$mac" &> /dev/null && {
-        sleep 4
         echo "$mac" > "$spkfile"
         echo "[${dev,,}] successfully connected."
         success=1
